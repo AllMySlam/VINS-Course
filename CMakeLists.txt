@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(vins_estimator)
+cmake_policy(SET CMP0042 NEW)
 
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_FLAGS "-std=c++11")
@@ -14,7 +15,7 @@ find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem program_options system)
 
 
-message(WARNING "OpenCV_VERSION: ${OpenCV_VERSION}")
+message(INFO "OpenCV_VERSION: ${OpenCV_VERSION}")
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/include

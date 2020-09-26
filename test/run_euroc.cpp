@@ -25,7 +25,8 @@ std::shared_ptr<System> pSystem;
 
 void PubImuData()
 {
-	string sImu_data_file = sConfig_path + "MH_05_imu0.txt";
+//    string sImu_data_file = sConfig_path + "MH_05_imu0.txt";
+    string sImu_data_file = sConfig_path + "MH_02_imu0.txt";
 	cout << "1 PubImuData start sImu_data_filea: " << sImu_data_file << endl;
 	ifstream fsImu;
 	fsImu.open(sImu_data_file.c_str());
@@ -52,7 +53,8 @@ void PubImuData()
 
 void PubImageData()
 {
-	string sImage_file = sConfig_path + "MH_05_cam0.txt";
+//    string sImage_file = sConfig_path + "MH_05_cam0.txt";
+    string sImage_file = sConfig_path + "MH_02_cam0.txt";
 
 	cout << "1 PubImageData start sImage_file: " << sImage_file << endl;
 
@@ -93,7 +95,8 @@ void PubImageData()
 #ifdef __APPLE__
 // support for MacOS
 void DrawIMGandGLinMainThrd(){
-	string sImage_file = sConfig_path + "MH_05_cam0.txt";
+//    string sImage_file = sConfig_path + "MH_05_cam0.txt";
+    string sImage_file = sConfig_path + "MH_02_cam0.txt";
 
 	cout << "1 PubImageData start sImage_file: " << sImage_file << endl;
 

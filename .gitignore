@@ -12,3 +12,8 @@
 
 .vscode/
 build/
+.idea
+cmake-build-debug
+out
+bin/*.dylib
+bin/*.txt
