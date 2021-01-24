@@ -5,16 +5,16 @@
 using namespace std;
 using namespace cv;
 using namespace pangolin;
+int SIMULATE_OPEN;
+string DATA_PATH;
 
 System::System(string sConfig_file_)
     :bStart_backend(true)
 {
-    string sConfig_file = sConfig_file_ + "euroc_config.yaml";
+    cout << "1 System() sConfig_file: " << sConfig_file_ << endl;
+    readParameters(sConfig_file_);
 
-    cout << "1 System() sConfig_file: " << sConfig_file << endl;
-    readParameters(sConfig_file);
-
-    trackerData[0].readIntrinsicParameter(sConfig_file);
+    trackerData[0].readIntrinsicParameter(sConfig_file_);
 
     estimator.setParameter();
     ofs_pose.open("./pose_output.txt",fstream::out);
@@ -47,7 +47,7 @@ System::~System()
     ofs_pose.close();
 }
 
-void System::PubImageData(double dStampSec, Mat &img)
+void System::PubImageData(double dStampSec, Mat &img, std::string filename="")
 {
     if (!init_feature)
     {
@@ -92,7 +92,12 @@ void System::PubImageData(double dStampSec, Mat &img)
 
     TicToc t_r;
     // cout << "3 PubImageData t : " << dStampSec << endl;
-    trackerData[0].readImage(img, dStampSec);
+    if (SIMULATE_OPEN) {
+        trackerData[0].readImage(filename, dStampSec);//进行特征点提取(直方图均衡)
+    } else {
+        trackerData[0].readImage(img, dStampSec);//进行特征点提取(直方图均衡)
+    }
+
 
     for (unsigned int i = 0;; i++)
     {
@@ -110,20 +115,20 @@ void System::PubImageData(double dStampSec, Mat &img)
         vector<set<int>> hash_ids(NUM_OF_CAM);
         for (int i = 0; i < NUM_OF_CAM; i++)
         {
-            auto &un_pts = trackerData[i].cur_un_pts;
+            auto &un_pts = trackerData[i].cur_un_pts;//归一化图像坐标
             auto &cur_pts = trackerData[i].cur_pts;
             auto &ids = trackerData[i].ids;
             auto &pts_velocity = trackerData[i].pts_velocity;
             for (unsigned int j = 0; j < ids.size(); j++)
             {
-                if (trackerData[i].track_cnt[j] > 1)
+                if (trackerData[i].track_cnt[j] > 1 || SIMULATE_OPEN)
                 {
-                    int p_id = ids[j];
+                    int p_id = SIMULATE_OPEN ? j : ids[j];
                     hash_ids[i].insert(p_id);
                     double x = un_pts[j].x;
                     double y = un_pts[j].y;
                     double z = 1;
-                    feature_points->points.push_back(Vector3d(x, y, z));
+                    feature_points->points.push_back(Vector3d(x, y, z));//归一化平面上的坐标
                     feature_points->id_of_point.push_back(p_id * NUM_OF_CAM + i);
                     feature_points->u_of_point.push_back(cur_pts[j].x);
                     feature_points->v_of_point.push_back(cur_pts[j].y);
@@ -315,7 +320,7 @@ void System::ProcessBackEnd()
 
             // TicToc t_s;
             map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> image;
-            for (unsigned int i = 0; i < img_msg->points.size(); i++) 
+            for (unsigned int i = 0; i < img_msg->points.size(); i++)
             {
                 int v = img_msg->id_of_point[i] + 0.5;
                 int feature_id = v / NUM_OF_CAM;

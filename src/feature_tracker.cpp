@@ -78,6 +78,44 @@ void FeatureTracker::addPoints()
     }
 }
 
+void FeatureTracker::readImage(std::string filename,double _cur_time) {
+    cur_time = _cur_time;
+
+    ids.clear();
+    cur_un_pts.clear();
+    track_cnt.clear();
+
+	ifstream fsFeatures;
+	fsFeatures.open(filename.c_str());
+	if (!fsFeatures.is_open())
+	{
+		cerr << "Failed to open fsFeatures file! " << filename << endl;
+		return;
+	}
+	std::string sFeature_line;
+	double dStampNSec = 0.0;
+    Eigen::Vector4d p;
+    Eigen::Vector2d f;
+	while (std::getline(fsFeatures, sFeature_line) && !sFeature_line.empty())
+	{
+		std::istringstream ssFeatureData(sFeature_line);
+		ssFeatureData >> p(0) >> p(1) >> p(2) >> p(3) >> f(0) >> f(1);
+
+        cur_un_pts.push_back(cv::Point2f(f(0),f(1)));
+
+        float u = FOCAL_LENGTH * f(0) + COL / 2.0;
+        float v = FOCAL_LENGTH * f(1) + ROW / 2.0;
+        cur_pts.push_back(cv::Point2f(u,v));
+
+        ids.push_back(-1);
+        track_cnt.push_back(1);
+        pts_velocity.push_back(cv::Point2f(0, 0));
+	}
+	fsFeatures.close();
+
+    prev_time = cur_time;
+}
+
 void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
 {
     cv::Mat img;

@@ -32,6 +32,8 @@ class FeatureTracker
 
     void readImage(const cv::Mat &_img,double _cur_time);
 
+    void readImage(std::string filename,double _cur_time);
+
     void setMask();
 
     void addPoints();

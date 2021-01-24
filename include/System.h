@@ -17,6 +17,8 @@
 #include "parameters.h"
 #include "feature_tracker.h"
 
+extern int SIMULATE_OPEN;
+extern string DATA_PATH;
 
 //imu for vio
 struct IMU_MSG
@@ -46,7 +48,7 @@ public:
 
     ~System();
 
-    void PubImageData(double dStampSec, cv::Mat &img);
+    void PubImageData(double dStampSec, cv::Mat &img, std::string filename);
 
     void PubImuData(double dStampSec, const Eigen::Vector3d &vGyr, 
         const Eigen::Vector3d &vAcc);

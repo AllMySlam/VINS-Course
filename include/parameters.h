@@ -13,6 +13,9 @@
 // extern int COL;
 const int NUM_OF_CAM = 1;
 
+extern int SIMULATE_OPEN;
+extern std::string DATA_PATH;
+
 extern int FOCAL_LENGTH;
 extern std::string IMAGE_TOPIC;
 extern std::string IMU_TOPIC;

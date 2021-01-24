@@ -65,6 +65,9 @@ void readParameters(string config_file)
         return;
     }
 
+    SIMULATE_OPEN = fsSettings["simulate_open"];
+    fsSettings["data_path"] >> DATA_PATH;
+
     fsSettings["imu_topic"] >> IMU_TOPIC;
 
     FOCAL_LENGTH = 460;
@@ -90,7 +93,7 @@ void readParameters(string config_file)
     // ROS_INFO("ROW: %f COL: %f ", ROW, COL);
 
     ESTIMATE_EXTRINSIC = fsSettings["estimate_extrinsic"];
-    if (ESTIMATE_EXTRINSIC == 2)
+    if (ESTIMATE_EXTRINSIC == 2) // 等于2说明对外参数一无所知
     {
         // ROS_WARN("have no prior about extrinsic param, calibrate extrinsic param");
         RIC.push_back(Eigen::Matrix3d::Identity());
@@ -99,12 +102,12 @@ void readParameters(string config_file)
     }
     else
     {
-        if (ESTIMATE_EXTRINSIC == 1)
+        if (ESTIMATE_EXTRINSIC == 1) // 等于1,有个标定的初始值
         {
             // ROS_WARN(" Optimize extrinsic param around initial guess!");
             EX_CALIB_RESULT_PATH = OUTPUT_PATH + "/extrinsic_parameter.csv";
         }
-        if (ESTIMATE_EXTRINSIC == 0){
+        if (ESTIMATE_EXTRINSIC == 0){ //初始化操作
             cout << " fix extrinsic param " << endl;
         }
         cv::Mat cv_R, cv_T;
@@ -173,6 +176,7 @@ void readParameters(string config_file)
     fsSettings.release();
 
     cout << "1 readParameters:  "
+        <<  "\n  SIMULATE_OPEN: " << SIMULATE_OPEN
         <<  "\n  INIT_DEPTH: " << INIT_DEPTH
         <<  "\n  MIN_PARALLAX: " << MIN_PARALLAX
         <<  "\n  ACC_N: " <<ACC_N

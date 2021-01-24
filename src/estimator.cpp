@@ -7,7 +7,6 @@
 #include "backend/edge_imu.h"
 
 #include <ostream>
-#include <fstream>
 
 using namespace myslam;
 
@@ -142,7 +141,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
 {
     //ROS_DEBUG("new image coming ------------------------------------------");
     // cout << "Adding feature points: " << image.size()<<endl;
-    if (f_manager.addFeatureCheckParallax(frame_count, image, td))
+    if (f_manager.addFeatureCheckParallax(frame_count, image, td)) //视差 vins-mono的两种操作,判断像素运动
         marginalization_flag = MARGIN_OLD;
     else
         marginalization_flag = MARGIN_SECOND_NEW;
@@ -158,7 +157,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
     all_image_frame.insert(make_pair(header, imageframe));
     tmp_pre_integration = new IntegrationBase{acc_0, gyr_0, Bas[frame_count], Bgs[frame_count]};
 
-    if (ESTIMATE_EXTRINSIC == 2)
+    if (ESTIMATE_EXTRINSIC == 2) //等于2说明对外参数一无所知
     {
         cout << "calibrating extrinsic param, rotation movement is needed" << endl;
         if (frame_count != 0)
@@ -172,7 +171,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
                                                             //    << calib_ric);
                 ric[0] = calib_ric;
                 RIC[0] = calib_ric;
-                ESTIMATE_EXTRINSIC = 1;
+                ESTIMATE_EXTRINSIC = 1;//标定为1,有个标定的初始值
             }
         }
     }
@@ -185,7 +184,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
             if (ESTIMATE_EXTRINSIC != 2 && (header - initial_timestamp) > 0.1)
             {
                 // cout << "1 initialStructure" << endl;
-                result = initialStructure();
+                result = initialStructure();//初始化操作
                 initial_timestamp = header;
             }
             if (result)
@@ -1248,7 +1247,7 @@ void Estimator::slideWindowOld()
 {
     sum_of_back++;
 
-    bool shift_depth = solver_flag == NON_LINEAR ? true : false;
+    bool shift_depth = solver_flag == NON_LINEAR;
     if (shift_depth)
     {
         Matrix3d R0, R1;
